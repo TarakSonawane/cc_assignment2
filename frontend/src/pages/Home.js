@@ -3,7 +3,7 @@ import axios from "axios";
 import ProductList from "../components/ProductList";
 import ProductForm from "../components/ProductForm";
 
-const API_URL = "backend-cc-tarak-c5bahfa3hngrdpbf.centralindia-01.azurewebsites.net/api/products";
+const API_URL = "backend-cc-tarak-c5bahfa3hngrdpbf.centralindia-01.azurewebsites.net/products";
 
 function Home() {
   const [products, setProducts] = useState([]);
