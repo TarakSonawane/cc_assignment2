@@ -1,5 +1,5 @@
 // src/api.js
-const API_URL = "http://127.0.0.1:5000"; // Change this if your backend URL is different
+const API_URL = "backend-cc-tarak-c5bahfa3hngrdpbf.centralindia-01.azurewebsites.net"; // Change this if your backend URL is different
 
 // Fetch all products
 export const fetchProducts = async () => {
@@ -23,7 +23,7 @@ export const addProduct = async (product) => {
   }
 
   try {
-    const response = await fetch("http://127.0.0.1:5000/products", {
+    const response = await fetch("backend-cc-tarak-c5bahfa3hngrdpbf.centralindia-01.azurewebsites.net/products", {
       method: "POST",
       body: formData,
     });
