@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ProductList from "./components/ProductList";
 import AddProduct from "./components/AddProduct";
 import SearchBar from "./components/SearchBar";
-import { fetchProducts, searchProducts } from "./api";
+import { fetchProducts } from "./api";
 
 const App = () => {
   const [products, setProducts] = useState([]);
