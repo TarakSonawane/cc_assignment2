@@ -8,33 +8,31 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import text  # Import text function
 
 app = Flask(__name__)
-from dotenv import load_dotenv
-import os
 
-# Load environment variables from .env file
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
-
-# Fetch the Azure Storage connection string from the environment
+# ✅ Fetch Environment Variables from Azure App Service
 AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 
+# 🔴 Error handling for missing env variables
 if not AZURE_STORAGE_CONNECTION_STRING:
-    raise ValueError("❌ AZURE_STORAGE_CONNECTION_STRING is not set! Check .env file.")
+    raise ValueError("❌ AZURE_STORAGE_CONNECTION_STRING is missing! Set it in Azure App Service Configuration.")
+if not DB_PASSWORD:
+    raise ValueError("❌ DB_PASSWORD is missing! Set it in Azure App Service Configuration.")
 
-print("✅ AZURE_STORAGE_CONNECTION_STRING Loaded Successfully")
+print("✅ Environment variables loaded successfully from Azure")
 
-# Enable CORS for frontend (localhost:3000)
+# Enable CORS for frontend (localhost:3000 or deployed frontend)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# Define database connection parameters
+# ✅ Secure Database Connection using Environment Variables
 db_params = urllib.parse.quote_plus(
-    "Driver={ODBC Driver 18 for SQL Server};"
-    "Server=tcp:productcatalouge.database.windows.net,1433;"
-    "Database=product_catalouge_A2;"
-    "Uid=adminn;"
-    "Pwd=Guitar@tarak13;"
-    "Encrypt=yes;"
-    "TrustServerCertificate=no;"
-    "Connection Timeout=30;"
+    f"Driver={{ODBC Driver 18 for SQL Server}};"
+    f"Server=tcp:productcatalouge.database.windows.net,1433;"
+    f"Database=product_catalouge_A2;"
+    f"Uid=adminn;Pwd={DB_PASSWORD};"
+    f"Encrypt=yes;"
+    f"TrustServerCertificate=no;"
+    f"Connection Timeout=30;"
 )
 
 # Set up SQLAlchemy URI
@@ -43,12 +41,11 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# Azure Blob Storage Configuration
-AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+# ✅ Azure Blob Storage Configuration
 AZURE_CONTAINER_NAME = "product-images"
 blob_service_client = BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
 
-# Product Model
+# ✅ Product Model
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
@@ -56,11 +53,11 @@ class Product(db.Model):
     description = db.Column(db.Text, nullable=True)
     image_url = db.Column(db.String(500), nullable=True)
 
-# Create tables if they don’t exist
+# ✅ Create tables if they don’t exist
 with app.app_context():
     db.create_all()
 
-# Test database connection
+# ✅ Test database connection
 with app.app_context():
     try:
         db.session.execute(text("SELECT 1"))  # Ensure text() is used correctly
@@ -68,8 +65,7 @@ with app.app_context():
     except Exception as e:
         print("❌ Database connection failed:", str(e))
 
-
-# Route to add a product
+# ✅ Route to add a product
 @app.route("/products", methods=["POST"])
 def add_product():
     try:
@@ -97,11 +93,10 @@ def add_product():
 
         return jsonify({"message": "Product added successfully"}), 201
     except Exception as e:
-        print("❌ Error adding product:", str(e))  # Print error for debugging
+        print("❌ Error adding product:", str(e))
         return jsonify({"error": "Failed to add product", "details": str(e)}), 500
 
-
-# Route to get all products
+# ✅ Route to get all products
 @app.route("/products", methods=["GET"])
 def get_products():
     try:
@@ -119,8 +114,7 @@ def get_products():
         print("❌ Error fetching products:", str(e))
         return jsonify({"error": "Failed to fetch products", "details": str(e)}), 500
 
-
-# Route to delete a product (with image deletion)
+# ✅ Route to delete a product (with image deletion)
 @app.route("/products/<int:product_id>", methods=["DELETE"])
 def delete_product(product_id):
     try:
@@ -141,8 +135,7 @@ def delete_product(product_id):
         print("❌ Error deleting product:", str(e))
         return jsonify({"error": "Failed to delete product", "details": str(e)}), 500
 
-
-# Route to delete all products (CAUTION: This will wipe all data)
+# ✅ Route to delete all products (CAUTION: This will wipe all data)
 @app.route("/products/delete_all", methods=["DELETE"])
 def delete_all_products():
     try:
@@ -153,8 +146,7 @@ def delete_all_products():
         print("❌ Error deleting all products:", str(e))
         return jsonify({"error": "Failed to delete all products", "details": str(e)}), 500
 
-
-# Search Route (Real-time search)
+# ✅ Search Route (Real-time search)
 @app.route("/products/search", methods=["GET"])
 def search_products():
     try:
@@ -176,7 +168,6 @@ def search_products():
         print("❌ Error searching products:", str(e))
         return jsonify({"error": "Failed to search products", "details": str(e)}), 500
 
-
-# Run the application
+# ✅ Run the application
 if __name__ == "__main__":
     app.run(debug=True)
