@@ -23,8 +23,8 @@ const ProductList = ({ products, onDelete }) => {
             <img
               src={product.image_url}
               alt={product.name}
-              className="w-full h-32 object-cover rounded-md"
-            />
+              className="w-full h-32 object-contain rounded-md bg-gray-100"
+          />
           )}
           <h3 className="text-lg font-bold mt-2">{product.name}</h3>
           <p className="text-gray-700">₹{product.price}</p>
